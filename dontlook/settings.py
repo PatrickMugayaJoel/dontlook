@@ -27,6 +27,26 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+        # 'file': {
+        #     'class': 'logging.handlers.RotatingFileHandler',
+        #     'formatter': 'precise',
+        #     'filename': './automation_app.log',
+        #     'maxBytes': 1024,
+        #     'backupCount': 3,
+        # },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+}
 
 # Application definition
 

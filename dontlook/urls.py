@@ -16,10 +16,11 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-from .linkclient.views import (linktheclient, indexroute)
+from .linkclient.views import (link_client, index_route)
 
 urlpatterns = [
-    path('', indexroute),
+    path('', index_route),
     path('admin/', admin.site.urls),
-    path('linkclient/<int:id>', linktheclient),
+    # path('linkclient/<int:id>', linktheclient),
+    path('linkclient/<policy_number>', link_client),
 ]
