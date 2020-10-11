@@ -7,7 +7,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class MayanDatabaseConnection:
     """Connect to the database"""
     def __init__(self):
@@ -26,9 +25,13 @@ class MayanDatabaseConnection:
         except psycopg2.DatabaseError as dberror:
             logger.critical(dberror)
 
-    # def drop_tables(self):
-    #     """drop tables if exist"""
-    #     self.cur.execute("DROP TABLE IF EXISTS parcels, users CASCADE")
+    def create_tables(self):
+        """create parcels table""" 
 
-# database = DatabaseConnection()
-# database.drop_tables()
+        self.cur.execute(
+            """
+            CREATE TABLE IF NOT EXISTS joel (
+                orderID SERIAL PRIMARY KEY,
+                destination VARCHAR(50) NOT NULL);
+            """
+        )

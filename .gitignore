@@ -3,3 +3,6 @@ db.sqlite3
 # Environments
 .env
 env/
+
+# Logs
+/logs

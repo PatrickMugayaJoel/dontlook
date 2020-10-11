@@ -20,7 +20,21 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+import environ
 
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+# reading .env file
+environ.Env.read_env()
+
+# False if not in os.environ
+DEBUG = env('DEBUG')
+
+# Raises django's ImproperlyConfigured exception if SECRET_KEY not in os.environ
+# SECRET_KEY = env('SECRET_KEY')
 
 def main():
     """Run administrative tasks."""
