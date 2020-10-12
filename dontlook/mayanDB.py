@@ -25,13 +25,29 @@ class MayanDatabaseConnection:
         except psycopg2.DatabaseError as dberror:
             logger.critical(dberror)
 
-    def create_tables(self):
-        """create parcels table""" 
+    def get_doc_id_by_policy_no(self, policy_number):
 
-        self.cur.execute(
-            """
-            CREATE TABLE IF NOT EXISTS joel (
-                orderID SERIAL PRIMARY KEY,
-                destination VARCHAR(50) NOT NULL);
-            """
-        )
+        try:
+            self.cur.execute(
+                f"""
+                SELECT document_id FROM metadata_documentmetadata WHERE value='{policy_number}';
+                """
+            )
+            return self.cur.fetchone()
+        except Exception as ex:
+            print(f"\nError: {ex}")
+            logger.critical(f'\n{ex}')
+
+    def insert_metadata_by_policy_no(self, data):
+
+        try:
+            self.cur.execute(
+                f"""
+                INSERT INTO metadata_documentmetadata (value, document_id, metadata_type_id)
+                VALUES ('{data["client_id"]}', {data["document_id"]}, {data["metatype_id"]});
+                """
+            )
+            return True
+        except Exception as ex:
+            print(f"\nError: {ex}")
+            logger.critical(f'\n{ex}')

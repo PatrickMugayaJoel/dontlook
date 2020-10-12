@@ -12,7 +12,7 @@ import requests
 import logging
 import json
 import re
-# from ..mayanDB import MayanDatabaseConnection
+from ..mayanDB import MayanDatabaseConnection
 
 # import json
 # json.dumps()
@@ -23,8 +23,7 @@ logger = logging.getLogger(__name__)
 # logger.error()
 # logger.critical()
 
-# mayan_database = MayanDatabaseConnection()
-# mayan_database.create_tables()
+mayan_database = MayanDatabaseConnection()
 
 @api_view()
 def index_route(request):
@@ -50,8 +49,23 @@ def link_client(request, policy_number):
 			# TODO Update metadata in DB. by metadata_id=2 & document_id
 			policy_number = new_policy_number
 
+		# '010/030/1/000110/2020'
+		result = mayan_database.get_doc_id_by_policy_no(policy_number)
+		if not result.get('document_id'):
+			return Response({"message": "Request failed! Metadata id not found"}, 404)
+
 		# TODO query for the client id in AIMs
-		# TODO attach id as metadata to document by adding it to the DB
+		client_id = '00123'
+		metatype_id = 5
+
+		result = mayan_database.insert_metadata_by_policy_no({
+			'metatype_id': metatype_id,
+			'client_id': client_id,
+			'document_id': result.get('document_id')
+		})
+		if not result:
+			return Response({"message": "Update db query failed!"}, 400)
+
 		return Response({"message": "Got some POST data!", "data": policy_number})
 
 	return Response({
