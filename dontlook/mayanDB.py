@@ -36,7 +36,7 @@ class MayanDatabaseConnection:
             return self.cur.fetchone()
         except Exception as ex:
             print(f"\nError: {ex}")
-            logger.critical(f'\n{ex}')
+            logger.critical(f'\n\n{ex}\n\n')
 
     def insert_metadata_by_policy_no(self, data):
 
@@ -50,4 +50,4 @@ class MayanDatabaseConnection:
             return True
         except Exception as ex:
             print(f"\nError: {ex}")
-            logger.critical(f'\n{ex}')
+            logger.critical(f'\n\n{ex}\n\n')
