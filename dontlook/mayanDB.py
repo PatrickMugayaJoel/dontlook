@@ -13,9 +13,9 @@ class MayanDatabaseConnection:
 
         try:
             self.conn = psycopg2.connect(host=os.environ.get("MAYAN_DB_HOST"),
-                                            database=os.environ.get("MAYAN_DB_NAME"),
-                                            user=os.environ.get("MAYAN_DB_USER"),
-                                            password=os.environ.get("MAYAN_DB_PASSWORD"),
+                                            database=os.environ.get("MAYAN_DATABASE_DB"),
+                                            user=os.environ.get("MAYAN_DATABASE_USER"),
+                                            password=os.environ.get("MAYAN_DATABASE_PASSWORD"),
                                             port=os.environ.get("MAYAN_DB_PORT"))
                                         
             self.cur = self.conn.cursor(cursor_factory=RealDictCursor)
