@@ -1,11 +1,15 @@
 """Database models"""
 import os
 import psycopg2
-from psycopg2.extras import RealDictCursor
 import logging
+from psycopg2.extras import RealDictCursor
 
 
 logger = logging.getLogger(__name__)
+
+def print_a_log(msg):
+	print(f"\nError: {msg}")
+	logger.critical(f'\n\n{msg}\n\n')
 
 class MayanDatabaseConnection:
     """Connect to the database"""
@@ -20,10 +24,10 @@ class MayanDatabaseConnection:
                                         
             self.cur = self.conn.cursor(cursor_factory=RealDictCursor)
             self.conn.autocommit = True
-            logger.info('Mayan Database connection successfuly created')
+            logger.info('Mayan Database connection successfully created')
 
         except psycopg2.DatabaseError as dberror:
-            logger.critical(dberror)
+            print_a_log(dberror)
 
     def get_doc_id_by_policy_no(self, policy_number):
 
@@ -35,8 +39,7 @@ class MayanDatabaseConnection:
             )
             return self.cur.fetchone()
         except Exception as ex:
-            print(f"\nError: {ex}")
-            logger.critical(f'\n\n{ex}\n\n')
+            print_a_log(ex)
 
     def insert_metadata_by_policy_no(self, data):
 
@@ -49,5 +52,18 @@ class MayanDatabaseConnection:
             )
             return True
         except Exception as ex:
-            print(f"\nError: {ex}")
-            logger.critical(f'\n\n{ex}\n\n')
+            print_a_log(ex)
+
+    def get_cabinet_by_label(self, label):
+
+        print(f"labeling: {label}")
+        try:
+            self.cur.execute(
+                f"""
+                SELECT * FROM public.cabinets_cabinet WHERE label='{label}';
+                """
+            )
+            return self.cur.fetchone()
+        except Exception as ex:
+            print(f"failing: {label}")
+            print_a_log(ex)

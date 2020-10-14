@@ -36,7 +36,7 @@ services:
       POSTGRES_DB: ${MAYAN_DATABASE_DB:-mayan}
       POSTGRES_PASSWORD: ${MAYAN_DATABASE_PASSWORD:-mayandbpass}
       POSTGRES_USER: ${MAYAN_DATABASE_USER:-mayan}
-    image: postgres:10.6
+    image: postgres:${POSTGRES_VERSION}
     networks:
       - bridge
     ports:
