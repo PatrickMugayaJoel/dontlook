@@ -1,6 +1,0 @@
-post to /linkclient/policy_number
-body: policy_number & document_id
-- cross checks policy_number format
-- Adds clientno to doc as metadata
-- Creates client's cabinet with the client's id if it does not exist
-- Adds document to the cabinet

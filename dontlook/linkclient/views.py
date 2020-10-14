@@ -1,10 +1,3 @@
-# >>> requests.post('https://httpbin.org/post', data={'key':'value'})
-# >>> requests.put('https://httpbin.org/put', data={'key':'value'})
-# >>> requests.delete('https://httpbin.org/delete')
-# >>> requests.head('https://httpbin.org/get')
-# >>> requests.patch('https://httpbin.org/patch', data={'key':'value'})
-# >>> requests.options('https://httpbin.org/get')
-
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -15,14 +8,9 @@ import re
 import os
 from ..mayanDB import MayanDatabaseConnection
 
-# import json
 # json.dumps()
 
-# Get an instance of a logger
 logger = logging.getLogger(__name__)
-# logger.exception()
-# logger.error()
-# logger.critical()
 
 mayan_database = MayanDatabaseConnection()
 mayan_app_url = os.environ.get("MAYAN_APP_URL")
