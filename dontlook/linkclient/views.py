@@ -6,18 +6,40 @@ import logging
 import json
 import re
 import os
+import time
+import socket
+import sys
 from ..mayanDB import MayanDatabaseConnection
 
 # json.dumps()
 
-logger = logging.getLogger(__name__)
+mayan_app_host = os.environ.get("MAYAN_APP_HOST")
 
-mayan_database = MayanDatabaseConnection()
-mayan_app_url = os.environ.get("MAYAN_APP_URL")
+session = requests.Session()
+logger = logging.getLogger(__name__)
 
 def print_a_log(msg):
 	print(f"\nError: {msg}")
 	logger.critical(f'\n\n{msg}\n\n')
+
+start_time = time.perf_counter()
+print("Connecting to mayan")
+while True:
+	try:
+		session.headers.update(requests.post(
+			f'http://{mayan_app_host}/api/auth/token/obtain/?format=json',
+			data={'username': os.environ.get("MAYAN_APP_USER_NAME"), 'password': os.environ.get("MAYAN_APP_USER_PASS")}
+		).json())
+		break
+	except Exception as ex:
+		if time.perf_counter() - start_time >= 30:
+			print_a_log("Auto app to Mayan Connection failed!!")
+			sys.exit()
+		print("Trying again in 2sec..")
+		time.sleep(2)
+
+mayan_database = MayanDatabaseConnection()
+
 
 def alter_policy_number(policy_number):
 	# Removing slashes from policy_number
@@ -46,8 +68,7 @@ def add_to_cabinet(document_id, client_id):
 	result = mayan_database.get_cabinet_by_label(client_id)
 
 	if not result:
-		result = requests.post(f"{mayan_app_url}/api/cabinets/",
-		auth=(f'{os.environ.get("MAYAN_APP_USER_NAME")}', f'{os.environ.get("MAYAN_APP_USER_PASS")}'),
+		result = session.post(f"http://{mayan_app_host}/api/cabinets/",
 		data={
 			"documents_pk_list": f"{document_id}",
 			"label": client_id,
@@ -59,8 +80,7 @@ def add_to_cabinet(document_id, client_id):
 		)
 	else:
 		cabinet_id = result.get('id')
-		result = requests.get(f"{mayan_app_url}/api/cabinets/{cabinet_id}/documents/",
-		auth=(f'{os.environ.get("MAYAN_APP_USER_NAME")}', f'{os.environ.get("MAYAN_APP_USER_PASS")}'))
+		result = session.get(f"http://{mayan_app_host}/api/cabinets/{cabinet_id}/documents/")
 		request_raise_exception(result, f"Could not fetch cabinet {client_id}'s docs'. code => {result.status_code}")
 		
 		result = result.json()['results']
@@ -71,8 +91,7 @@ def add_to_cabinet(document_id, client_id):
 			else:
 				documents_pk_list = f"{documents_pk_list},{x['id']}"
 
-		result = requests.post(f"{mayan_app_url}/api/cabinets/{cabinet_id}/documents/",
-		auth=(f'{os.environ.get("MAYAN_APP_USER_NAME")}', f'{os.environ.get("MAYAN_APP_USER_PASS")}'),
+		result = session.post(f"http://{mayan_app_host}/api/cabinets/{cabinet_id}/documents/",
 		data={"documents_pk_list": f"{documents_pk_list},{document_id}"})
 		request_raise_exception(result, f"Did not add doc to cabinet: {client_id}. code => {result.status_code}")
 
@@ -87,22 +106,25 @@ def index(request):
 
 
 @api_view(['GET', 'POST'])
-def attach_client(request, policy_number):
+def attach_client(request):
 
 	if (request.method == 'POST'):
-		policy_number = request.data.get('policy_number')
-		if (len(policy_number) == 17):
-			policy_number = alter_policy_number(policy_number)
+		# policy_number = request.data.get('policy_number')
+		# if (len(policy_number) == 17):
+		# 	policy_number = alter_policy_number(policy_number)
 
-		# '010/030/1/000110/2020'
-		result = mayan_database.get_doc_id_by_policy_no(policy_number) # TODO many docs could have the same policy_number
-		document_id = result.get('document_id')
-		if not document_id:
-			return Response({"message": "Request failed! Metadata id not found"}, 404)
+		# # '010/030/1/000110/2020'
+		# result = mayan_database.get_doc_id_by_policy_no(policy_number) # TODO many docs could have the same policy_number
+		# document_id = result.get('document_id')
+		# if not document_id:
+		# 	return Response({"message": "Request failed! Metadata id not found"}, 404)
 
 		# TODO query for the client id in AIMs
 		client_id = '00125'
-		client_no_metatype_id = 5
+		client_no_metatype_id = 1
+		document_id=1
+
+		print(request.data)
 
 		result = mayan_database.insert_metadata_by_policy_no({
 			'metatype_id': client_no_metatype_id,
@@ -112,9 +134,9 @@ def attach_client(request, policy_number):
 		if not result:
 			return Response({"message": "Update db query failed!"}, 400)
 		
-		result = add_to_cabinet(document_id, client_id)
-		if not (result == True):
-			return Response({"add_to_cabinet_error": result}, 400)
+		# result = add_to_cabinet(document_id, client_id)
+		# if not (result == True):
+		# 	return Response({"add_to_cabinet_error": result}, 400)
 
 		return Response({"message": "Operations were successfull"})
 	else:

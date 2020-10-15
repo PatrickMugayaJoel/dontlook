@@ -19,7 +19,7 @@ services:
       # MAYAN_APT_INSTALLS: "tesseract-ocr-deu tesseract-ocr-nld"
       # To add Python libraries, like LDAP, put then in the variable below.
       # MAYAN_PIP_INSTALLS: "python-ldap"
-    image: mayanedms/mayanedms:3
+    image: mayanedms/mayanedms:3.5
     networks:
       - bridge
     ports:
@@ -71,15 +71,17 @@ services:
     volumes:
       - ${MAYAN_REDIS_VOLUME:-redis}:/data
 
-  # automation-api:
-  #   build: ${MAYAN_AUTO_APP:-aapi}
-  #   command: python manage.py runserver 0.0.0.0:8080
-  #   networks:
-  #     - bridge
-  #   volumes:
-  #    - ${MAYAN_AUTO_APP:-aapi}:/myCode
-  #   ports:
-  #    - "8000:8080"
+  automation-api:
+    depends_on:
+      - app
+    build: ${MAYAN_AUTO_APP:-aapi}
+    command: python manage.py runserver 0.0.0.0:8080
+    networks:
+      - bridge
+    volumes:
+     - ${MAYAN_AUTO_APP:-aapi}:/myCode
+    ports:
+     - "8000:8080"
 
 volumes:
   app:
