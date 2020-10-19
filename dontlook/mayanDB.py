@@ -29,19 +29,17 @@ class MayanDatabaseConnection:
         except psycopg2.DatabaseError as dberror:
             print_a_log(dberror)
 
-    def get_doc_id_by_policy_no(self, policy_number):
+    def clear_test_tables(self, metatype_id, document_id):
+        if os.environ.get("MAYAN_DATABASE_DB") == "test":
+            try:
+                self.cur.execute(f"DELETE FROM metadata_documentmetadata WHERE metadata_type_id={int(metatype_id)} AND document_id={int(document_id)}")
+                self.cur.execute("TRUNCATE TABLE cabinets_cabinet RESTART IDENTITY CASCADE")
+                return True
+            except Exception as ex:
+                print(f"clear_test_tables SQL query failed.")
+                print_a_log(ex)
 
-        try:
-            self.cur.execute(
-                f"""
-                SELECT document_id FROM metadata_documentmetadata WHERE value='{policy_number}';
-                """
-            )
-            return self.cur.fetchone()
-        except Exception as ex:
-            print_a_log(ex)
-
-    def insert_metadata_by_policy_no(self, data):
+    def insert_metadata(self, data):
 
         try:
             self.cur.execute(
@@ -56,7 +54,6 @@ class MayanDatabaseConnection:
 
     def get_cabinet_by_label(self, label):
 
-        print(f"labeling: {label}")
         try:
             self.cur.execute(
                 f"""
@@ -65,5 +62,27 @@ class MayanDatabaseConnection:
             )
             return self.cur.fetchone()
         except Exception as ex:
-            print(f"failing: {label}")
+            print(f"get_cabinet_by_label SQL query failed. label => {label}")
             print_a_log(ex)
+
+    def get_client_no_metatype_id(self):
+
+        try:
+            self.cur.execute(
+                f"""
+                SELECT * FROM metadata_metadatatype WHERE name='client_number';
+                """
+            )
+            return self.cur.fetchone()
+        except Exception as ex:
+            print(f"get_client_no_metatype_id SQL query failed.")
+            print_a_log(ex)
+
+    def check_added_metadata(self, metatype_id, document_id):
+        if os.environ.get("MAYAN_DATABASE_DB") == "test":
+            try:
+                self.cur.execute(f"SELECT * FROM metadata_documentmetadata WHERE metadata_type_id={int(metatype_id)} AND document_id={int(document_id)}")
+                return self.cur.fetchall()
+            except Exception as ex:
+                print(f"check_added_metadata SQL query failed.")
+                print_a_log(ex)

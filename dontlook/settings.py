@@ -25,7 +25,7 @@ SECRET_KEY = '-3eeou84su5wi$u1p5fjy)pfxy)7&w54e40x^^nbpm6i&5z6bw'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.200.*','localhost']
+ALLOWED_HOSTS = ['192.168.200.190','192.168.200.143','localhost']
 
 # logger config
 LOGGING = {

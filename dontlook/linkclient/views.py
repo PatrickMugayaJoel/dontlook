@@ -12,9 +12,9 @@ import sys
 from ..mayanDB import MayanDatabaseConnection
 
 # json.dumps()
+CLIENTS_CABINET_ID = 58
 
 mayan_app_host = os.environ.get("MAYAN_APP_HOST")
-
 session = requests.Session()
 logger = logging.getLogger(__name__)
 
@@ -32,13 +32,16 @@ while True:
 		).json())
 		break
 	except Exception as ex:
-		if time.perf_counter() - start_time >= 30:
+		if time.perf_counter() - start_time >= 60:
 			print_a_log("Auto app to Mayan Connection failed!!")
-			sys.exit()
-		print("Trying again in 2sec..")
-		time.sleep(2)
+			sys.exit(1)
+		print("Trying again in 3sec..")
+		time.sleep(3)
 
 mayan_database = MayanDatabaseConnection()
+metatype_id = mayan_database.get_client_no_metatype_id()
+if not metatype_id:
+	exit(3)
 
 
 def alter_policy_number(policy_number):
@@ -72,7 +75,7 @@ def add_to_cabinet(document_id, client_id):
 		data={
 			"documents_pk_list": f"{document_id}",
 			"label": client_id,
-			"parent": 1
+			"parent": CLIENTS_CABINET_ID
 		})
 		request_raise_exception(
 			result,
@@ -112,27 +115,19 @@ def attach_client(request):
 		# policy_number = request.data.get('policy_number')
 		# if (len(policy_number) == 17):
 		# 	policy_number = alter_policy_number(policy_number)
+		#	#TODO Add logic to update policy no in db
 
-		# # '010/030/1/000110/2020'
-		# result = mayan_database.get_doc_id_by_policy_no(policy_number) # TODO many docs could have the same policy_number
-		# document_id = result.get('document_id')
-		# if not document_id:
-		# 	return Response({"message": "Request failed! Metadata id not found"}, 404)
-
-		# TODO query for the client id in AIMs
+		# TODO query for client no in AIMs
 		client_id = '00125'
-		client_no_metatype_id = 1
-		document_id=1
+		document_id=request.data.get('document_id')
 
-		print(request.data)
-
-		result = mayan_database.insert_metadata_by_policy_no({
-			'metatype_id': client_no_metatype_id,
+		result2 = mayan_database.insert_metadata({
+			'metatype_id': metatype_id.get('id'),
 			'client_id': client_id,
 			'document_id': document_id
 		})
-		if not result:
-			return Response({"message": "Update db query failed!"}, 400)
+		if not result2:
+			return Response({"message": f"Update db query failed! Client-{client_id}, document-{document_id}, meta_id-{metatype_id.get('id')}"}, 400)
 		
 		# result = add_to_cabinet(document_id, client_id)
 		# if not (result == True):
