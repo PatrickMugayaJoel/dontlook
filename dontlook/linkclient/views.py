@@ -102,6 +102,8 @@ def attach_client(request):
 		# 	policy_number = alter_policy_number(policy_number)
 		#	#TODO Add logic to update policy no in db
 
+		print(f"\nPOST data: {request.data}")
+
 		client_id = None
 		if request.data.get('client_number'):
 			client_id = request.data.get('client_number')
