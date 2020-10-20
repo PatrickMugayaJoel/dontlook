@@ -103,8 +103,8 @@ def attach_client(request):
 		#	#TODO Add logic to update policy no in db
 
 		client_id = None
-		if request.data.get('document_id'):
-			client_id = request.data.get('document_id')
+		if request.data.get('client_number'):
+			client_id = request.data.get('client_number')
 		elif False:
 			# TODO query for client no in AIMs
 			pass
