@@ -13,30 +13,14 @@ from ..mayanDB import MayanDatabaseConnection
 
 # json.dumps()
 CLIENTS_CABINET_ID = 58
+AUTH=(os.environ.get("MAYAN_APP_USER_NAME"), os.environ.get("MAYAN_APP_USER_PASS"))
 
 mayan_app_host = os.environ.get("MAYAN_APP_HOST")
-session = requests.Session()
 logger = logging.getLogger(__name__)
 
 def print_a_log(msg):
 	print(f"\nError: {msg}")
 	logger.critical(f'\n\n{msg}\n\n')
-
-start_time = time.perf_counter()
-print("Connecting to mayan")
-while True:
-	try:
-		session.headers.update(requests.post(
-			f'http://{mayan_app_host}/api/auth/token/obtain/?format=json',
-			data={'username': os.environ.get("MAYAN_APP_USER_NAME"), 'password': os.environ.get("MAYAN_APP_USER_PASS")}
-		).json())
-		break
-	except Exception as ex:
-		if time.perf_counter() - start_time >= 60:
-			print_a_log("Auto app to Mayan Connection failed!!")
-			sys.exit(1)
-		print("Trying again in 3sec..")
-		time.sleep(3)
 
 mayan_database = MayanDatabaseConnection()
 metatype_id = mayan_database.get_client_no_metatype_id()
@@ -71,19 +55,20 @@ def add_to_cabinet(document_id, client_id):
 	result = mayan_database.get_cabinet_by_label(client_id)
 
 	if not result:
-		result = session.post(f"http://{mayan_app_host}/api/cabinets/",
+		result = requests.post(f"http://{mayan_app_host}/api/cabinets/",
 		data={
 			"documents_pk_list": f"{document_id}",
 			"label": client_id,
 			"parent": CLIENTS_CABINET_ID
-		})
+		}, auth=AUTH)
+		print(result.json())
 		request_raise_exception(
 			result,
 			f"{os.environ.get('MAYAN_APP_USER_NAME')} did not create cabinet with label: {client_id}. code => {result.status_code}"
 		)
 	else:
 		cabinet_id = result.get('id')
-		result = session.get(f"http://{mayan_app_host}/api/cabinets/{cabinet_id}/documents/")
+		result = requests.get(f"http://{mayan_app_host}/api/cabinets/{cabinet_id}/documents/", auth=AUTH)
 		request_raise_exception(result, f"Could not fetch cabinet {client_id}'s docs'. code => {result.status_code}")
 		
 		result = result.json()['results']
@@ -94,8 +79,8 @@ def add_to_cabinet(document_id, client_id):
 			else:
 				documents_pk_list = f"{documents_pk_list},{x['id']}"
 
-		result = session.post(f"http://{mayan_app_host}/api/cabinets/{cabinet_id}/documents/",
-		data={"documents_pk_list": f"{documents_pk_list},{document_id}"})
+		result = requests.post(f"http://{mayan_app_host}/api/cabinets/{cabinet_id}/documents/",
+		data={"documents_pk_list": f"{documents_pk_list},{document_id}"}, auth=AUTH)
 		request_raise_exception(result, f"Did not add doc to cabinet: {client_id}. code => {result.status_code}")
 
 	return True
@@ -117,21 +102,28 @@ def attach_client(request):
 		# 	policy_number = alter_policy_number(policy_number)
 		#	#TODO Add logic to update policy no in db
 
-		# TODO query for client no in AIMs
-		client_id = '00125'
-		document_id=request.data.get('document_id')
+		client_id = None
+		if request.data.get('document_id'):
+			client_id = request.data.get('document_id')
+		elif False:
+			# TODO query for client no in AIMs
+			pass
 
-		result2 = mayan_database.insert_metadata({
+		document_id= request.data.get('document_id')
+
+		if not client_id:
+			return Response({"message": "No client ID was found."}, 400)
+
+		## try adding client_number metadata
+		mayan_database.insert_metadata({
 			'metatype_id': metatype_id.get('id'),
 			'client_id': client_id,
 			'document_id': document_id
 		})
-		if not result2:
-			return Response({"message": f"Update db query failed! Client-{client_id}, document-{document_id}, meta_id-{metatype_id.get('id')}"}, 400)
 		
-		# result = add_to_cabinet(document_id, client_id)
-		# if not (result == True):
-		# 	return Response({"add_to_cabinet_error": result}, 400)
+		result = add_to_cabinet(document_id, client_id)
+		if not (result == True):
+			return Response({"add_to_cabinet_error": result}, 400)
 
 		return Response({"message": "Operations were successfull"})
 	else:
