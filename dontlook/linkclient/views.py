@@ -80,7 +80,7 @@ def add_to_cabinet(document_id, client_id):
 			else:
 				documents_pk_list = f"{documents_pk_list},{x['id']}"
 
-		data={"documents_pk_list": f"{documents_pk_list},{document_id}"}, auth=AUTH)
+		data={"documents_pk_list": f"{documents_pk_list},{document_id}"}
 		print("api/cabinets/id/doc DATA: ", data)
 		result = requests.post(f"http://{mayan_app_host}/api/cabinets/{cabinet_id}/documents/",
 		data=data
