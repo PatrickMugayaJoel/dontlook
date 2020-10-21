@@ -73,14 +73,19 @@ def add_to_cabinet(document_id, client_id):
 		request_raise_exception(result, f"Could not fetch cabinet {client_id}'s docs'. code => {result.status_code}")
 		
 		result = result.json()['results']
-		documents_pk_list = ""
-		for x in result:
-			if len(documents_pk_list) == 0:
-				documents_pk_list = str(x['id'])
-			else:
-				documents_pk_list = f"{documents_pk_list},{x['id']}"
 
-		data={"documents_pk_list": f"{documents_pk_list},{document_id}"}
+		if result:
+			documents_pk_list = ""
+			for x in result:
+				if len(documents_pk_list) == 0:
+					documents_pk_list = str(x['id'])
+				else:
+					documents_pk_list = f"{documents_pk_list},{x['id']}"
+			documents_pk_list = f"{documents_pk_list},{document_id}"
+		else:
+			documents_pk_list = str(document_id)
+
+		data={"documents_pk_list": documents_pk_list}
 		print("api/cabinets/id/doc DATA: ", data)
 		result = requests.post(f"http://{mayan_app_host}/api/cabinets/{cabinet_id}/documents/",
 		data=data, auth=AUTH)
