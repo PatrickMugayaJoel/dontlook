@@ -67,6 +67,7 @@ def add_to_cabinet(document_id, client_id):
 			f"{os.environ.get('MAYAN_APP_USER_NAME')} did not create cabinet with label: {client_id}. code => {result.status_code}"
 		)
 	else:
+		print("cabinet exists. Adding to it..")
 		cabinet_id = result.get('id')
 		result = requests.get(f"http://{mayan_app_host}/api/cabinets/{cabinet_id}/documents/", auth=AUTH)
 		request_raise_exception(result, f"Could not fetch cabinet {client_id}'s docs'. code => {result.status_code}")
@@ -79,8 +80,10 @@ def add_to_cabinet(document_id, client_id):
 			else:
 				documents_pk_list = f"{documents_pk_list},{x['id']}"
 
-		result = requests.post(f"http://{mayan_app_host}/api/cabinets/{cabinet_id}/documents/",
 		data={"documents_pk_list": f"{documents_pk_list},{document_id}"}, auth=AUTH)
+		print("api/cabinets/id/doc DATA: ", data)
+		result = requests.post(f"http://{mayan_app_host}/api/cabinets/{cabinet_id}/documents/",
+		data=data
 		request_raise_exception(result, f"Did not add doc to cabinet: {client_id}. code => {result.status_code}")
 
 	return True
