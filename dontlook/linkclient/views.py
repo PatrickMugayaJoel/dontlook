@@ -113,15 +113,15 @@ def attach_client(request):
 
 		document_id= request.data.get('document_id')
 		
-		policy_number = request.data.get('policy_number')
-		if (len(policy_number) == 17):
-			policy_number = alter_policy_number(policy_number)
-			## try adding alternative policy_number metadata
-			mayan_database.insert_metadata({
-				'metatype_id': alt_policy_no_metatype_id.get('id'),
-				'value': policy_number,
-				'document_id': document_id
-			})
+		# policy_number = request.data.get('policy_number')
+		# if (len(policy_number) == 17):
+		# 	policy_number = alter_policy_number(policy_number)
+		# 	## try adding alternative policy_number metadata
+		# 	mayan_database.insert_metadata({
+		# 		'metatype_id': alt_policy_no_metatype_id.get('id'),
+		# 		'value': policy_number,
+		# 		'document_id': document_id
+		# 	})
 
 		print(f"\nPOST data: {request.data}")
 
