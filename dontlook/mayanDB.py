@@ -45,7 +45,7 @@ class MayanDatabaseConnection:
             self.cur.execute(
                 f"""
                 INSERT INTO metadata_documentmetadata (value, document_id, metadata_type_id)
-                VALUES ('{data["client_id"]}', {data["document_id"]}, {data["metatype_id"]});
+                VALUES ('{data["value"]}', {data["document_id"]}, {data["metatype_id"]});
                 """
             )
             return True
@@ -65,17 +65,17 @@ class MayanDatabaseConnection:
             print(f"get_cabinet_by_label SQL query failed. label => {label}")
             print_a_log(ex)
 
-    def get_client_no_metatype_id(self):
+    def get_metatype_by_name(self, name):
 
         try:
             self.cur.execute(
                 f"""
-                SELECT * FROM metadata_metadatatype WHERE name='client_number';
+                SELECT * FROM metadata_metadatatype WHERE name='{name}';
                 """
             )
             return self.cur.fetchone()
         except Exception as ex:
-            print(f"get_client_no_metatype_id SQL query failed.")
+            print(f"get_metatype_by_name SQL query failed.")
             print_a_log(ex)
 
     def check_added_metadata(self, metatype_id, document_id):

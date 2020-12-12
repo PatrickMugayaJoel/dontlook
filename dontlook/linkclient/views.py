@@ -23,9 +23,15 @@ def print_a_log(msg):
 	logger.critical(f'\n\n{msg}\n\n')
 
 mayan_database = MayanDatabaseConnection()
-metatype_id = mayan_database.get_client_no_metatype_id()
-if not metatype_id:
+
+client_no_metatype_id = mayan_database.get_metatype_by_name('client_number')
+if not client_no_metatype_id:
 	exit(3)
+
+
+alt_policy_no_metatype_id = mayan_database.get_metatype_by_name("alt_policy_no")
+if not alt_policy_no_metatype_id:
+	exit(4)
 
 
 def alter_policy_number(policy_number):
@@ -39,7 +45,6 @@ def alter_policy_number(policy_number):
 	string_list.insert(3, "/")
 	new_policy_number = "".join(string_list)
 	logger.info(f"Updating policy_number {policy_number} to {new_policy_number}")
-	# TODO Update metadata in DB. by metadata_id=2 & document_id
 	return new_policy_number
 
 def request_raise_exception(result, message):
@@ -105,10 +110,18 @@ def index(request):
 def attach_client(request):
 
 	if (request.method == 'POST'):
-		# policy_number = request.data.get('policy_number')
-		# if (len(policy_number) == 17):
-		# 	policy_number = alter_policy_number(policy_number)
-		#	#TODO Add logic to update policy no in db
+
+		document_id= request.data.get('document_id')
+		
+		policy_number = request.data.get('policy_number')
+		if (len(policy_number) == 17):
+			policy_number = alter_policy_number(policy_number)
+			## try adding alternative policy_number metadata
+			mayan_database.insert_metadata({
+				'metatype_id': alt_policy_no_metatype_id.get('id'),
+				'value': policy_number,
+				'document_id': document_id
+			})
 
 		print(f"\nPOST data: {request.data}")
 
@@ -119,15 +132,13 @@ def attach_client(request):
 			# TODO query for client no in AIMs
 			pass
 
-		document_id= request.data.get('document_id')
-
 		if not client_id:
 			return Response({"message": "No client ID was found."}, 400)
 
 		## try adding client_number metadata
 		mayan_database.insert_metadata({
-			'metatype_id': metatype_id.get('id'),
-			'client_id': client_id,
+			'metatype_id': client_no_metatype_id.get('id'),
+			'value': client_id,
 			'document_id': document_id
 		})
 		
