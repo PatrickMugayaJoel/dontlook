@@ -71,17 +71,17 @@ services:
     volumes:
       - ${MAYAN_REDIS_VOLUME:-redis}:/data
 
-  # automation-api:
-  #   depends_on:
-  #     - app
-  #   build: ${MAYAN_AUTO_APP:-aapi}
-  #   command: python manage.py runserver 0.0.0.0:8080
-  #   networks:
-  #     - bridge
-  #   volumes:
-  #    - ${MAYAN_AUTO_APP:-aapi}:/myCode
-  #   ports:
-  #    - "8000:8080"
+  automation-api:
+    depends_on:
+      - app
+    build: ${MAYAN_AUTO_APP:-aapi}
+    command: python manage.py runserver 0.0.0.0:8080
+    networks:
+      - bridge
+    volumes:
+     - ${MAYAN_AUTO_APP:-aapi}:/myCode
+    ports:
+     - "8000:8080"
 
 volumes:
   app:
