@@ -22,4 +22,5 @@ urlpatterns = [
     path('', index),
     path('admin/', admin.site.urls),
     path('attachclient', attach_client),
+    path('emailfrom', email_from),
 ]

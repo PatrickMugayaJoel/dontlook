@@ -52,6 +52,21 @@ class MayanDatabaseConnection:
         except Exception as ex:
             print_a_log(ex)
 
+    def update_metadata(self, data):
+
+        try:
+            self.cur.execute(
+                f"""
+                UPDATE metadata_documentmetadata
+                SET value = '{data["value"]}'
+                WHERE document_id = {data["document_id"]},
+                AND metadata_type_id = {data["metatype_id"]}
+                """
+            )
+            return True
+        except Exception as ex:
+            print_a_log(ex)
+
     def get_cabinet_by_label(self, label):
 
         try:

@@ -153,3 +153,29 @@ def attach_client(request):
 			"body": "policy_number & document_id"
 		})
 
+@api_view(['GET', 'POST'])
+def email_from(request):
+
+	if (request.method == 'POST'):
+		print(f"\nPOST data: {request.data}")
+		document_id= request.data.get('document_id')
+
+		start = request.data.get('email').index("<")
+		email = request.data.get('email')[start+1:-1]
+			
+		from_metatype_id = mayan_database.get_metatype_by_name('from')
+		if not from_metatype_id:
+			exit(5)
+		
+		## try adding client_number metadata
+		mayan_database.update_metadata({
+			'metatype_id': from_metatype_id.get('id'),
+			'value': email,
+			'document_id': document_id
+		})
+
+	else:
+		return Response({
+			"accepts": "POST",
+			"body": "email & document_id"
+		})
