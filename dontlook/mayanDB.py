@@ -64,6 +64,7 @@ class MayanDatabaseConnection:
                 """
             )
             return True
+            print("Query finished well: ", data["value"])
         except Exception as ex:
             print_a_log(ex)
 

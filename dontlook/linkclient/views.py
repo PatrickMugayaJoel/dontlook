@@ -160,8 +160,8 @@ def email_from(request):
 		print(f"\nPOST data: {request.data}")
 		document_id= request.data.get('document_id')
 
-		start = request.data.get('email').index("<")
-		email = request.data.get('email')[start+1:-1]
+		start = request.data.get('email').index(";")
+		email = request.data.get('email')[start+1:-4]
 			
 		from_metatype_id = mayan_database.get_metatype_by_name('from')
 		if not from_metatype_id:
