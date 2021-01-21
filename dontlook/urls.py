@@ -16,7 +16,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-from .linkclient.views import (attach_client, index)
+from .linkclient.views import (attach_client, index, email_from)
 
 urlpatterns = [
     path('', index),
