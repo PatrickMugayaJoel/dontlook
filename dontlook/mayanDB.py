@@ -63,7 +63,7 @@ class MayanDatabaseConnection:
                 AND metadata_type_id = {data["metatype_id"]}
                 """
             )
-            print("Query finished well: ", data["value"], data["metatype_id"])
+            print("Query finished well: ", os.environ.get("MAYAN_DB_HOST"), os.environ.get("MAYAN_DATABASE_DB"))
             return True
         except Exception as ex:
             print_a_log(ex)
