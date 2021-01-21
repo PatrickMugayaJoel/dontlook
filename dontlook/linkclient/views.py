@@ -174,6 +174,8 @@ def email_from(request):
 			'document_id': document_id
 		})
 
+		return Response({"message": "Operations were successfull"})
+
 	else:
 		return Response({
 			"accepts": "POST",
