@@ -59,7 +59,7 @@ class MayanDatabaseConnection:
                 f"""
                 UPDATE metadata_documentmetadata
                 SET value = '{data["value"]}'
-                WHERE document_id = {data["document_id"]},
+                WHERE document_id = {data["document_id"]}
                 AND metadata_type_id = {data["metatype_id"]}
                 """
             )
