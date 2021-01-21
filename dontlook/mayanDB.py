@@ -63,8 +63,8 @@ class MayanDatabaseConnection:
                 AND metadata_type_id = {data["metatype_id"]}
                 """
             )
+            print("Query finished well: ", data["value"], data["metatype_id"])
             return True
-            print("Query finished well: ", data["value"])
         except Exception as ex:
             print_a_log(ex)
 
