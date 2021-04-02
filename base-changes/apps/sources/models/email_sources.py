@@ -10,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from mayan.apps.common.serialization import yaml_load
 from mayan.apps.documents.models import Document
+from mayan.apps.user_management.models import UserExtras
 from mayan.apps.metadata.api import set_bulk_metadata
 from mayan.apps.metadata.models import MetadataType
 
@@ -104,7 +105,13 @@ class EmailBaseModel(IntervalBaseModel):
         if source.subject_metadata_type:
             metadata_dictionary[
                 source.subject_metadata_type.name
-            ] = message.headers.get('Subject')
+            ] = message.headers.get('Subject').upper()
+
+        if 'JOEL' in metadata_dictionary[source.subject_metadata_type.name]:
+            the_email = metadata_dictionary[source.from_metadata_type.name]
+            for user_info in UserExtras.objects.raw(f"SELECT * FROM nic_employee WHERE employee = '{the_email}';"):
+                metadata_dictionary['supervisor'] = user_info.supervisor
+                break
 
         document_ids, parts_metadata_dictionary = EmailBaseModel._process_message(source=source, message=message)
 
