@@ -6,7 +6,7 @@
 
 {% block content_plain %}
     <div class="row">
-        Claim No: {{ object.metadata_value_of.claim_number }}<br>
+        Reference No: {% if object.metadata_value_of.id %}{{ object.metadata_value_of.id }}{% else %}{{ object.metadata_value_of.claim_number }}{% endif %}<br>
         <div class="center-block">
             <div class="table-responsive">
                 <table class="table table-striped" style="margin-top: 10px">
