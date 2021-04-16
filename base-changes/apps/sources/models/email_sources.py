@@ -107,7 +107,17 @@ class EmailBaseModel(IntervalBaseModel):
                 source.subject_metadata_type.name
             ] = message.headers.get('Subject').upper()
 
-        if 'JOEL' in metadata_dictionary[source.subject_metadata_type.name]:
+
+        if 'PAYMENT' in metadata_dictionary[source.subject_metadata_type.name]:
+            metadata_dictionary['supervisor'] = None
+
+            if message.headers.get('Cc'):
+                metadata_dictionary['supervisor'] = EmailBaseModel._select_email(message.headers.get('Cc'))
+
+            if not metadata_dictionary['supervisor'] and message.headers.get("To"):
+                metadata_dictionary['supervisor'] = EmailBaseModel._select_email(message.headers.get('To'))
+
+        if 'LEAVE' in metadata_dictionary[source.subject_metadata_type.name]:
             the_email = metadata_dictionary[source.from_metadata_type.name]
             for user_info in UserExtras.objects.raw(f"SELECT * FROM nic_employee WHERE employee = '{the_email}';"):
                 metadata_dictionary['supervisor'] = user_info.supervisor
@@ -128,6 +138,29 @@ class EmailBaseModel(IntervalBaseModel):
                         document=document,
                         metadata_dictionary=metadata_dictionary
                     )
+
+    # ------------------------------------------------
+
+    @staticmethod
+    def _select_email(emailslist):
+        for x in emailslist.split(","):
+            mail = EmailBaseModel._process_email(x)
+            if mail == "edms@nic.co.ug":
+                continue
+            else:
+                return mail
+            return None
+
+    @staticmethod
+    def _process_email(email):
+        try:
+            start = email.index("<")
+            if start:
+                return email[start+1:-1]
+        except:
+            return email.strip()
+
+    # ------------------------------------------------
 
     @staticmethod
     def _process_message(source, message):
