@@ -12,7 +12,7 @@ try:
         thedatetime = datetime.now().strftime("%m-%d-%Y")
         # python2 => subprocess.run(["ls", "-l"])
         # subprocess.call([f"sudo tar -zcvf  '/home/cwakibi/mayanapp/backup-{datetime.now().strftime("%m/%d/%Y, %H:%M:%S")}.tar.gz' /docker-volumes/mayan-edms/"]) 
-        result = subprocess.call([f"sudo tar -zcvf  '/home/cwakibi/mayanapp/backup-{thedatetime}.tar.gz' ~/joeldelete/"])  # Test
+        result = subprocess.call([f"sudo tar -zcvf  '/home/cwakibi/mayanapp/backup.tar.gz' ~/joeldelete/"])  # Test
         logging.info(result)
         time.sleep(20)
 except:
