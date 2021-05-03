@@ -1,7 +1,6 @@
 
 from datetime import datetime
 import logging
-import sys
 import subprocess
 import time
 
@@ -9,11 +8,12 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', filename
 
 try:
     while true:
-        thedatetime = datetime.now().strftime("%m-%d-%Y")
+        thedatetime = datetime.now().strftime("%m-%d-%Y, %H:%M:%S")
         # python2 => subprocess.run(["ls", "-l"])
         # subprocess.call([f"sudo tar -zcvf  '/home/cwakibi/mayanapp/backup-{datetime.now().strftime("%m/%d/%Y, %H:%M:%S")}.tar.gz' /docker-volumes/mayan-edms/"]) 
-        result = subprocess.call([f"sudo tar -zcvf  '/home/cwakibi/mayanapp/backup.tar.gz' ~/joeldelete/"])  # Test
+        result = subprocess.call([f"sudo tar -zcvf  '/home/cwakibi/mayanapp/backup-{thedatetime}.tar.gz' ~/joeldelete/"])  # Test
         logging.info(result)
         time.sleep(20)
-except:
-    logging.error(sys.exc_info()[0])
+except Exception as e:
+    logging.error(str(e))
+
