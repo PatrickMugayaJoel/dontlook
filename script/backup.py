@@ -5,7 +5,7 @@ import sys
 import subprocess
 import time
 
-logging.basicConfig(format='%(asctime)s - %(levelname) - %(message)s', filename='/home/cwakibi/mayanapp/backup.log', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', filename='/home/cwakibi/mayanapp/backup.log', level=logging.DEBUG)
 
 try:
     while true:
