@@ -9,10 +9,16 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', filename
 try:
     while True:
         thedatetime = datetime.now().strftime("%m-%d-%Y-%H-%M-%S")
-        # os.system(f"sudo tar -zcvf  '/home/cwakibi/mayanapp/backup-{thedatetime}.tar.gz' /docker-volumes/mayan-edms/") 
-        result = os.system(f"sudo tar -zcvf  '/home/cwakibi/mayanapp/backup {thedatetime}.tar.gz' /home/cwakibi/joeldelete")  # Test
+        # os.system(f"sudo tar -zcvf  /home/cwakibi/mayanapp/backup/backup-{thedatetime}.tar.gz /docker-volumes/mayan-edms/")
+        first = os.listdir('/home/cwakibi/mayanapp/backup/')
+        result = os.system(f"sudo tar -zcvf  /home/cwakibi/mayanapp/backup/backup-{thedatetime}.tar.gz /home/cwakibi/joeldelete")  # Test
+        entries = os.listdir('/home/cwakibi/mayanapp/backup/')
         logging.info(result)
-        time.sleep(20)
+
+        if first and (entries > 1):
+            os.system(f"sudo rm /home/cwakibi/mayanapp/backup/{first[0]}")
+
+        time.sleep(30)
 except Exception as e:
     logging.error(str(e))
 
