@@ -8,7 +8,7 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', filename
 
 try:
     while True:
-        thedatetime = datetime.now().strftime("%m-%d-%Y, %H:%M:%S")
+        thedatetime = datetime.now().strftime("%m-%d-%Y-%H-%M-%S")
         # python2 => subprocess.run(["ls", "-l"])
         # subprocess.call([f"sudo tar -zcvf  '/home/cwakibi/mayanapp/backup-{datetime.now().strftime("%m/%d/%Y, %H:%M:%S")}.tar.gz' /docker-volumes/mayan-edms/"]) 
         result = subprocess.call([f"sudo tar -zcvf  '/home/cwakibi/mayanapp/backup-{thedatetime}.tar.gz' ~/joeldelete/"])  # Test
