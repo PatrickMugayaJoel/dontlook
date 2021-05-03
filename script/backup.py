@@ -1,10 +1,11 @@
 
 from datetime import datetime
 import logging
-import time
+import sys
 import subprocess
+import time
 
-logging.basicConfig(filename='/home/cwakibi/mayanapp/backup.log', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s - %(levelname) - %(message)s', filename='/home/cwakibi/mayanapp/backup.log', level=logging.DEBUG)
 
 try:
     while true:
@@ -15,4 +16,4 @@ try:
         logging.info(result)
         time.sleep(20)
 except:
-    logging.error("An Error occurred!")
+    logging.error(sys.exc_info()[0])
