@@ -10,7 +10,7 @@ try:
     while True:
         thedatetime = datetime.now().strftime("%m-%d-%Y-%H-%M-%S")
         # os.system(f"sudo tar -zcvf  '/home/cwakibi/mayanapp/backup-{thedatetime}.tar.gz' /docker-volumes/mayan-edms/") 
-        result = os.system(f"sudo tar -zcvf  '/home/cwakibi/mayanapp/backup {thedatetime}.tar.gz' /docker-volumes/mayan-edms/")  # Test
+        result = os.system(f"sudo tar -zcvf  '/home/cwakibi/mayanapp/backup {thedatetime}.tar.gz' /home/cwakibi/joeldelete")  # Test
         logging.info(result)
         time.sleep(20)
 except Exception as e:
