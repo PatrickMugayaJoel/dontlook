@@ -15,10 +15,10 @@ try:
         entries = os.listdir('/home/cwakibi/mayanapp/backup/')
         logging.info(result)
 
-        if first and (entries > 1):
+        if first and (len(entries) > 1):
             os.system(f"sudo rm /home/cwakibi/mayanapp/backup/{first[0]}")
 
-        time.sleep(30)
+        time.sleep(15)
 except Exception as e:
     logging.error(str(e))
 
