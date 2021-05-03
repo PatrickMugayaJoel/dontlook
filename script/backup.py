@@ -15,4 +15,4 @@ try:
         logging.info(result)
         time.sleep(20)
 except:
-    logging.error("An Error occurred!"
+    logging.error("An Error occurred!")
