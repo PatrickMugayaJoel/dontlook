@@ -4,7 +4,7 @@ import logging
 import time
 import subprocess
 
-logging.basicConfig(filename='/home/cwakibi/mayanapp/backup.log', encoding='utf-8', level=logging.DEBUG)
+logging.basicConfig(filename='/home/cwakibi/mayanapp/backup.log', level=logging.DEBUG)
 
 try:
     while true:
