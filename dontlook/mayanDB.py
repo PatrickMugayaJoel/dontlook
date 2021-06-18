@@ -111,7 +111,7 @@ class MayanDatabaseConnection:
                 document_states_workflowtransition swt, document_states_workflowstate sws
                 WHERE
                     swi.document_id = {int(document_id)} 
-                    AND swi.id != 5837
+                    AND swi.workflow_id != 3
                     AND swil.workflow_instance_id = swi.id
                     AND swil.transition_id = swt.id
                     AND swt.destination_state_id = sws.id
