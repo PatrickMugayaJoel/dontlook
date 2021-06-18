@@ -1,2 +1,6 @@
 
+{% if transition.state %}
 <div style="width: 100%; text-align: center;" ><div style="margin-top: 100px;">This file was submitted to <b style="font-size: larger;">"{{transition.state}}"</b> on {{transition.datetime}}</div></div>
+{% else %}
+<div style="width: 100%; text-align: center;" ><div style="margin-top: 100px;">Sorry, document was not found!</div></div>
+{% endif %}
