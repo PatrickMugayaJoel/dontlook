@@ -16,11 +16,12 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-from .linkclient.views import (attach_client, index, email_from)
+from .linkclient.views import (attach_client, index, email_from, current_document_state)
 
 urlpatterns = [
     path('', index),
     path('admin/', admin.site.urls),
     path('attachclient', attach_client),
     path('emailfrom', email_from),
+    path('document/<int:document_id>/track', current_document_state),
 ]

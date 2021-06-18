@@ -101,3 +101,23 @@ class MayanDatabaseConnection:
             except Exception as ex:
                 print(f"check_added_metadata SQL query failed.")
                 print_a_log(ex)
+
+    def get_current_document_state(self, document_id):
+
+        try:
+            self.cur.execute(
+                f"""SELECT swi.document_id AS id, swil.datetime, sws.label AS state
+                FROM document_states_workflowinstance swi, document_states_workflowinstancelogentry swil,
+                document_states_workflowtransition swt, document_states_workflowstate sws
+                WHERE
+                    swi.document_id = {int(document_id)} 
+                    AND swi.id != 5837
+                    AND swil.workflow_instance_id = swi.id
+                    AND swil.transition_id = swt.id
+                    AND swt.destination_state_id = sws.id
+                ORDER BY swil.datetime DESC LIMIT 1;"""
+            )
+            return self.cur.fetchone()
+        except Exception as ex:
+            print(f"get_current_document_state SQL query failed.")
+            print_a_log(ex)

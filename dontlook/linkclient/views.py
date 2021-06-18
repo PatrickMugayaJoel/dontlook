@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from django.http import HttpResponse
+from django.template import loader
 import requests
 import logging
 import json
@@ -183,3 +185,11 @@ def email_from(request):
 			"accepts": "POST",
 			"body": "email & document_id"
 		})
+
+def current_document_state(request, document_id):
+    template = loader.get_template('trackfile/index.html')
+    transition = mayan_database.get_current_document_state(document_id)
+    context = {
+            'transition': transition,
+    	}
+    return HttpResponse(template.render(context, request))
