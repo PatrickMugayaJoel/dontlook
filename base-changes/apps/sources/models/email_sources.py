@@ -131,6 +131,7 @@ class EmailBaseModel(IntervalBaseModel):
 
         if document_ids:
             metadata_dictionary["id"] = document_ids[0]
+            metadata_dictionary["hasMultipleAttachments"] = len(document_ids)
 
             if metadata_dictionary:
                 for document in Document.objects.filter(id__in=document_ids):
