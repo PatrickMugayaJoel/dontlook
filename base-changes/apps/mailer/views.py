@@ -245,7 +245,7 @@ class SendMailReminders(View):
 
     def get(self, request, *args, **kwargs):
 
-        pending_stages = Document.objects.raw(f"""SELECT nested.workflow, nested.state_id as id, count(nested.state_id), nts.email
+        pending_stages = Document.objects.raw(f"""SELECT nested.workflow as wx, nested.state_id as id, count(nested.state_id) as ecount, nts.email
             FROM (
                 SELECT DISTINCT ON(id) swi.id AS id, swi.workflow_id AS workflow, sws.id AS state_id, max(swil.datetime) AS datetime
                 FROM document_states_workflowinstance swi, document_states_workflowinstancelogentry swil,
@@ -258,7 +258,7 @@ class SendMailReminders(View):
                 order by id, datetime desc) AS nested, nic_tracked_states nts
             WHERE nested.state_id in (SELECT state_id FROM public."nic_tracked_states")
             AND nested.state_id = nts.state_id
-            AND nested.datetime < (now() - '20 hours'::interval)
+            AND nested.datetime < (now() - '10 minutes'::interval)
             group by nts.email, nested.state_id, nested.workflow;""")
 
         today = date.today()
@@ -270,20 +270,14 @@ class SendMailReminders(View):
 
         user_mailer = UserMailer.objects.get(pk=1)
 
-        for stage in enumerate(pending_stages):
-            print(stage)
+        for stage in pending_stages:
+
             workflow = 'Edms'
-            if stage['workflow'] in [1, 6]:
+            if stage.wx in [1]:
                 workflow = 'Claim'
-            elif stage['workflow'] == 13:
-                workflow = 'Medical'
-            elif stage['workflow'] == 9:
-                workflow = 'Leave'
-            elif stage['workflow'] == 11:
-                workflow = 'Payment MEMO'
-            
+
             grammer = []
-            if stage['count'] > 1:
+            if stage.ecount > 1:
                 grammer.append("files have")
             else:
                 grammer.append("file has")
@@ -291,16 +285,16 @@ class SendMailReminders(View):
             body = f"""
             Dear Sir/Madam,<br><br>
 
-            This is a kind reminder, {stage['count']} {workflow} {grammer[0]} not been attended to in 24hrs.<br><br>
+            This is a kind reminder, {stage.ecount} {workflow} {grammer[0]} not been attended to in 24hrs.<br><br>
 
             Below is a link to the state documents.<br>
-            <a href='http://192.168.200.190/#/workflows/workflow_runtime_proxies/states/{stage['id']}/documents/'>http://192.168.200.190/#/workflows/workflow_runtime_proxies/states/{stage['id']}/documents/</a><br><br>
+            <a href='http://192.168.200.190/#/workflows/workflow_runtime_proxies/states/{stage.id}/documents/'>http://192.168.200.190/#/workflows/workflow_runtime_proxies/states/{stage.id}/documents/</a><br><br>
 
             ----<br>
             This email was sent by Mayan Edms.
             """
 
-            # user_mailer.send(body=body, subject=f'Delayed Edms files reminder. {de}', to=stage['email'] )
+            user_mailer.send(body=body, subject=f'Delayed Edms files reminder. {de}', to=stage.email )
 
         return HttpResponseRedirect(redirect_to='home')
 
