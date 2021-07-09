@@ -574,9 +574,9 @@ class APISendMailReminders(APIView):
             workflow = 'Edms'
             if stage.wx in [1, 6]:
                 workflow = 'Claim'
-            else if stage.wx in 13:
+            else if stage.wx == 13:
                 workflow = 'Medical'
-            else if stage.wx in 9:
+            else if stage.wx == 9:
                 workflow = 'Leave'
 
             grammer = []
