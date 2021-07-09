@@ -186,6 +186,7 @@ def email_from(request):
 			"body": "email & document_id"
 		})
 
+@api_view()
 def current_document_state(request, document_id):
     template = loader.get_template('trackfile/index.html')
     transition = mayan_database.get_current_document_state(document_id)
