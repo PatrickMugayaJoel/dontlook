@@ -1,4 +1,6 @@
 import logging
+from datetime import date
+from django.apps import apps
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -7,6 +9,7 @@ from django.views.decorators.cache import cache_control, patch_cache_control
 
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from mayan.apps.acls.models import AccessControlList
 from mayan.apps.rest_api import generics
@@ -536,3 +539,60 @@ class APIDocumentVersionView(generics.RetrieveUpdateDestroyAPIView):
             return DocumentVersionSerializer
         else:
             return WritableDocumentVersionSerializer
+
+class APISendMailReminders(APIView):
+
+    def get(self, request, *args, **kwargs):
+
+        pending_stages = Document.objects.raw(f"""SELECT nested.workflow as wx, nested.state_id as id, count(nested.state_id) as ecount, nts.email
+            FROM (
+                SELECT DISTINCT ON(id) swi.id AS id, swi.workflow_id AS workflow, sws.id AS state_id, max(swil.datetime) AS datetime
+                FROM document_states_workflowinstance swi, document_states_workflowinstancelogentry swil,
+                document_states_workflowtransition swt, document_states_workflowstate sws
+                WHERE swi.workflow_id in (SELECT * FROM public."nic_tracked_workflows")
+                    AND swil.workflow_instance_id = swi.id
+                    AND swil.transition_id = swt.id
+                    AND swt.destination_state_id = sws.id
+                group by swi.id, sws.id
+                order by id, datetime desc) AS nested, nic_tracked_states nts
+            WHERE nested.state_id in (SELECT state_id FROM public."nic_tracked_states")
+            AND nested.state_id = nts.state_id
+            AND nested.datetime < (now() - '20 hours'::interval)
+            group by nts.email, nested.state_id, nested.workflow;""")
+
+        today = date.today()
+        de = today.strftime("%d/%m/%Y")
+
+        UserMailer = apps.get_model(
+            app_label='mailer', model_name='UserMailer'
+        )
+
+        user_mailer = UserMailer.objects.get(pk=1)
+
+        for stage in pending_stages:
+
+            workflow = 'Edms'
+            if stage.wx in [1]:
+                workflow = 'Claim'
+
+            grammer = []
+            if stage.ecount > 1:
+                grammer.append("files have")
+            else:
+                grammer.append("file has")
+    
+            body = f"""
+            Dear Sir/Madam,<br><br>
+
+            This is a kind reminder, {stage.ecount} {workflow} {grammer[0]} not been attended to in 24hrs.<br><br>
+
+            Below is a link to the state documents.<br>
+            <a href='http://192.168.200.190/#/workflows/workflow_runtime_proxies/states/{stage.id}/documents/'>http://192.168.200.190/#/workflows/workflow_runtime_proxies/states/{stage.id}/documents/</a><br><br>
+
+            ----<br>
+            This email was sent by Mayan Edms.
+            """
+
+            user_mailer.send(body=body, subject=f'Delayed Edms files reminder. {de}', to=stage.email )
+
+        return Response({"message":"done"}, status=status.HTTP_200_OK)

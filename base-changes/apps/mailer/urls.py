@@ -3,14 +3,10 @@ from django.conf.urls import url
 from .views import (
     MailDocumentLinkView, MailDocumentView, UserMailerBackendSelectionView,
     UserMailingCreateView, UserMailingDeleteView, UserMailingEditView,
-    UserMailerTestView, UserMailerListView, SendMailReminders
+    UserMailerTestView, UserMailerListView
 )
 
 urlpatterns = [
-    url(
-        regex=r'^send/reminders/$',
-        name='send_mail_reminders', view=SendMailReminders.as_view()
-    ),
     url(
         regex=r'^documents/(?P<document_id>\d+)/send/link/$',
         name='send_document_link', view=MailDocumentLinkView.as_view()
