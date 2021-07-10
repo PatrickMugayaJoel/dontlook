@@ -104,7 +104,7 @@ def add_to_cabinet(document_id, client_id):
 def index(request):
 	logger.debug("Logger error")
 	return Response({"endpoints": [
-		"/attachclient"
+		"POST:/attachclient", "GET:/document/<document_id>/track"
 	]})
 
 
@@ -155,41 +155,11 @@ def attach_client(request):
 			"body": "policy_number & document_id"
 		})
 
-@api_view(['GET', 'POST'])
-def email_from(request):
-
-	if (request.method == 'POST'):
-		print(f"\nPOST data: {request.data}")
-		document_id= request.data.get('document_id')
-
-		# start = request.data.get('email').index(";")
-		# email = request.data.get('email')[start+1:-4]
-		start = request.data.get('email').index("<")
-		email = request.data.get('email')[start+1:-1]
-			
-		from_metatype_id = mayan_database.get_metatype_by_name('from')
-		if not from_metatype_id:
-			exit(5)
-		
-		## try adding client_number metadata
-		mayan_database.update_metadata({
-			'metatype_id': from_metatype_id.get('id'),
-			'value': email,
-			'document_id': document_id
-		})
-
-		return Response({"message": "Operations were successfull"})
-
-	else:
-		return Response({
-			"accepts": "POST",
-			"body": "email & document_id"
-		})
-
 @api_view()
 def current_document_state(request, document_id):
     template = loader.get_template('trackfile/index.html')
     transition = mayan_database.get_current_document_state(document_id)
+	transition.datetime = transition.datetime
     context = {
             'transition': transition,
     	}

@@ -22,6 +22,5 @@ urlpatterns = [
     path('', index),
     path('admin/', admin.site.urls),
     path('attachclient', attach_client),
-    path('emailfrom', email_from),
     path('document/<int:document_id>/track', current_document_state),
 ]

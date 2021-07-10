@@ -26,7 +26,6 @@ try:
                 os.system(f"sudo rm /home/cwakibi/mayanapp/backup/{first[0]}")
 
         ### reminder mails script
-        resp = None
         if datetime.now().hour == 8:
             resp = requests.get(f"http://{os.environ.get('MAYAN_APP_HOST')}/api/send/reminders/", auth=(os.environ.get("MAYAN_APP_USER_NAME"), os.environ.get("MAYAN_APP_USER_PASS")))
             logging.info(resp.reason)
